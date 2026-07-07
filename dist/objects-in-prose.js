@@ -79,10 +79,9 @@ function addPathToSVG(svg, obj) {
         pathEl.setAttribute('fill-opacity', String(s.fillOpacity));
     if (s.stroke) {
         pathEl.setAttribute('stroke', s.stroke);
-        // non-scaling-stroke keeps the width in CSS pixels regardless of the glyph's
-        // figure-space span. strokeWidth (default 1) is that pixel width, so a
-        // highlighted edge can be drawn bold.
-        pathEl.setAttribute('stroke-width', String(s.strokeWidth ?? 1));
+        // non-scaling-stroke keeps the outline at 1 CSS pixel regardless of how many
+        // figure-space units the path spans — correct for tiny glyphs.
+        pathEl.setAttribute('stroke-width', '1');
         pathEl.setAttribute('vector-effect', 'non-scaling-stroke');
     }
     svg.appendChild(pathEl);
