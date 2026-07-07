@@ -121,11 +121,12 @@ body {
   font-family: 'IBM Plex Mono', monospace;
   color: #ece6d8;
   margin-top: 1.5rem;
-  /* larger line → the inline {obj} glyphs (em-based) scale up with it.
-     Desktop ceiling 2rem is unchanged; narrow screens shrink instead of overrun. */
-  font-size: clamp(1.2rem, 4.5vw, 2.0rem);
-  line-height: 1.9;      /* room for the taller glyphs without clipping */
-  overflow-wrap: break-word;
+  /* Base "4K" size. The equation is kept on ONE line (nowrap) and fitEquations()
+     in prose.ts scales it DOWN to fit narrower columns — so one-line layout is
+     identical at every resolution. Bump this to make 4K formulas larger. */
+  font-size: 2.4rem;
+  line-height: 1.6;
+  white-space: nowrap;
 }
 
 /* Emphasised word inside body prose: Fraunces italic in gold ({em:...} token) */

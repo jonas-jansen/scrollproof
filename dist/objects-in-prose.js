@@ -64,10 +64,15 @@ function pathBBox(path) {
     }
     return { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
 }
+/** The geometry to draw for an inline glyph: the reposed `glyphPath` if the
+ *  object carries one, else its figure `path`. */
+function glyphGeom(obj) {
+    return obj.glyphPath ?? obj.path;
+}
 /** Adds a single <path> element for one PathObject to the given SVG. */
 function addPathToSVG(svg, obj) {
     const pathEl = document.createElementNS(SVG_NS, 'path');
-    pathEl.setAttribute('d', pathToD(obj.path));
+    pathEl.setAttribute('d', pathToD(glyphGeom(obj)));
     const s = obj.style ?? {};
     pathEl.setAttribute('fill', s.fill ?? 'none');
     if (s.fillOpacity !== undefined)
@@ -93,7 +98,7 @@ function makeGlyphGroup(objs, canvasWidth) {
     // Combined bounding box across all objects
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const obj of objs) {
-        const b = pathBBox(obj.path);
+        const b = pathBBox(glyphGeom(obj));
         if (b.x < minX)
             minX = b.x;
         if (b.y < minY)
@@ -115,21 +120,29 @@ function makeGlyphGroup(objs, canvasWidth) {
     // of a multi-object glyph share the same scale, so any part with it works.
     const proseScale = objs.find(o => o.proseScale !== undefined)?.proseScale;
     if (degenerate) {
-        // Length-bar: solid colored bar of width ∝ length, fixed thickness.
-        // Width from proseScale if present, else the canvas-relative fallback.
+        // Length "dimension line": a thin colored rule of width ∝ length, with short
+        // vertical ticks at each end — reads as a measured magnitude (Byrne style).
         const widthEm = proseScale !== undefined ? w * proseScale : (w / canvasWidth) * BAR_MAX_EM;
-        svg.setAttribute('viewBox', `${minX} ${minY - 0.5} ${w} 1`);
+        const midY = (minY + maxY) / 2;
+        const tick = 0.3; // half tick-height, in viewBox units
+        svg.setAttribute('viewBox', `${minX} ${midY - 0.5} ${w} 1`);
         svg.style.width = `${widthEm}em`;
         svg.style.height = `${BAR_THICKNESS_EM}em`;
-        for (const obj of objs) {
+        const color = objs[0]?.style?.stroke ?? objs[0]?.style?.fill ?? 'currentColor';
+        const stroke = (d) => {
             const p = document.createElementNS(SVG_NS, 'path');
-            p.setAttribute('d', pathToD(obj.path));
+            p.setAttribute('d', d);
             p.setAttribute('fill', 'none');
-            p.setAttribute('stroke', obj.style?.stroke ?? obj.style?.fill ?? 'currentColor');
-            p.setAttribute('stroke-width', '1'); // fills the height-1 viewBox → solid bar
-            p.setAttribute('stroke-linecap', 'butt');
+            p.setAttribute('stroke', color);
+            p.setAttribute('stroke-width', '2'); // non-scaling → 2 CSS px regardless of length
+            p.setAttribute('vector-effect', 'non-scaling-stroke');
+            p.setAttribute('stroke-linecap', 'round');
             svg.appendChild(p);
-        }
+        };
+        const x0 = minX, x1 = maxX;
+        stroke(`M ${x0} ${midY} L ${x1} ${midY}`); // the length itself
+        stroke(`M ${x0} ${midY - tick} L ${x0} ${midY + tick}`); // left end tick
+        stroke(`M ${x1} ${midY - tick} L ${x1} ${midY + tick}`); // right end tick
         return svg;
     }
     svg.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
