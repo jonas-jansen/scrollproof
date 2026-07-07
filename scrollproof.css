@@ -18,7 +18,14 @@ body {
   background: #11100d;
   color: #ece6d8;
   font-family: 'IBM Plex Mono', monospace;
+  overflow-x: hidden;   /* a wide glyph must never force horizontal page scroll */
 }
+
+/* ── Responsive prose sizing ─────────────────────────────────────────────────
+   Every prose size is clamp(min, viewport-relative, MAX) where MAX is the
+   desktop value — so on a wide screen the max always wins and full screen looks
+   exactly as before (crisp), while narrow screens scale DOWN instead of
+   overflowing. Inline {obj} glyphs are em-based, so they follow automatically. */
 
 /* ── Wide layout (default) ──────────────────────────────────────────────────
    Figure fixed on the left; prose scrolls on the right.
@@ -70,13 +77,16 @@ body {
   .step {
     /* height: 100vh unchanged — keeps scrollable = (N-1) × 100vh */
     padding: 50vh 1.5rem 2rem;
+    /* Anchor content just below the figure and let it grow DOWN, so tall
+       content never rises up behind the fixed figure (which paints on top). */
+    justify-content: flex-start;
   }
 }
 
 /* ── Step content ───────────────────────────────────────────────────────── */
 
 .step-label {
-  font-size: 0.7rem;
+  font-size: clamp(0.62rem, 2vw, 0.7rem);
   letter-spacing: 0.15em;
   color: #8f897a;
   margin-bottom: 1rem;
@@ -85,7 +95,7 @@ body {
 
 .step h2 {
   font-family: 'Fraunces', Georgia, serif;
-  font-size: 1.8rem;
+  font-size: clamp(1.35rem, 5vw, 1.8rem);
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 1rem;
@@ -101,17 +111,21 @@ body {
 .step p {
   color: #8f897a;
   line-height: 1.7;
-  font-size: 0.9rem;
+  font-size: clamp(0.82rem, 2.6vw, 0.9rem);
+  overflow-wrap: break-word;   /* long words / wide inline glyphs wrap, not overflow */
 }
 
 /* `.step p.step-equation` (0,2,1) must out-specify `.step p` (0,1,1) above,
-   otherwise the 0.9rem body rule wins and the equation never grows. */
+   otherwise the body rule wins and the equation never grows. */
 .step p.step-equation {
   font-family: 'IBM Plex Mono', monospace;
   color: #ece6d8;
   margin-top: 1.5rem;
-  font-size: 2.0rem;     /* larger line → the inline {obj} glyphs (1.2em) scale up too */
+  /* larger line → the inline {obj} glyphs (em-based) scale up with it.
+     Desktop ceiling 2rem is unchanged; narrow screens shrink instead of overrun. */
+  font-size: clamp(1.2rem, 4.5vw, 2.0rem);
   line-height: 1.9;      /* room for the taller glyphs without clipping */
+  overflow-wrap: break-word;
 }
 
 /* Emphasised word inside body prose: Fraunces italic in gold ({em:...} token) */
