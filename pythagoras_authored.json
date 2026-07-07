@@ -548,6 +548,130 @@
       }
     },
     {
+      "id": "ov-ab",
+      "path": [
+        [
+          [
+            119.8113,
+            209.6226
+          ],
+          [
+            173.2704,
+            209.6226
+          ],
+          [
+            226.7296,
+            209.6226
+          ],
+          [
+            280.1887,
+            209.6226
+          ]
+        ]
+      ],
+      "layer": 7,
+      "style": {
+        "stroke": "#ece6d8",
+        "strokeWidth": 3
+      },
+      "props": {
+        "opacity": 0
+      }
+    },
+    {
+      "id": "ov-ad1",
+      "path": [
+        [
+          [
+            119.8113,
+            209.6226
+          ],
+          [
+            119.8113,
+            263.0818
+          ],
+          [
+            119.8113,
+            316.5409
+          ],
+          [
+            119.8113,
+            370.0
+          ]
+        ]
+      ],
+      "layer": 7,
+      "style": {
+        "stroke": "#ece6d8",
+        "strokeWidth": 3
+      },
+      "props": {
+        "opacity": 0
+      }
+    },
+    {
+      "id": "ov-ad3",
+      "path": [
+        [
+          [
+            119.8113,
+            209.6226
+          ],
+          [
+            94.1509,
+            175.4088
+          ],
+          [
+            68.4906,
+            141.195
+          ],
+          [
+            42.8302,
+            106.9811
+          ]
+        ]
+      ],
+      "layer": 7,
+      "style": {
+        "stroke": "#0072B3",
+        "strokeWidth": 3
+      },
+      "props": {
+        "opacity": 0
+      }
+    },
+    {
+      "id": "ov-ac",
+      "path": [
+        [
+          [
+            119.8113,
+            209.6226
+          ],
+          [
+            154.0252,
+            183.9623
+          ],
+          [
+            188.239,
+            158.3019
+          ],
+          [
+            222.4528,
+            132.6415
+          ]
+        ]
+      ],
+      "layer": 7,
+      "style": {
+        "stroke": "#0072B3",
+        "strokeWidth": 3
+      },
+      "props": {
+        "opacity": 0
+      }
+    },
+    {
       "id": "arc1_0",
       "path": [
         [
@@ -2720,7 +2844,7 @@
       "id": "step-3",
       "label": "03",
       "heading": "A {em:Quarter-Turn}",
-      "body": "Take a copy of the first triangle and turn it a quarter-turn about $A$. It falls exactly onto the second. A rotation is rigid \u2014 it changes nothing but position \u2014 so the two triangles are congruent, and enclose the same area:",
+      "body": "The two triangles share more than an angle: two pairs of sides match \u2014 one pair from each square. A quarter-turn about $A$ then carries the first triangle exactly onto the second, so they are congruent and enclose the same area:",
       "equation": "{obj:snap1} = {obj:snap2}"
     }
   ],
@@ -2796,12 +2920,44 @@
     {
       "at": 0.5,
       "set": {
+        "ov-ab": {
+          "opacity": 0
+        },
+        "ov-ad1": {
+          "opacity": 0
+        },
+        "ov-ad3": {
+          "opacity": 0
+        },
+        "ov-ac": {
+          "opacity": 0
+        },
         "pivot": {
+          "opacity": 0,
           "rotate": 0,
           "rotateCenter": [
             119.8113,
             209.6226
-          ],
+          ]
+        }
+      }
+    },
+    {
+      "at": 0.575,
+      "set": {
+        "ov-ab": {
+          "opacity": 0.5
+        },
+        "ov-ad1": {
+          "opacity": 0.5
+        },
+        "ov-ad3": {
+          "opacity": 0
+        },
+        "ov-ac": {
+          "opacity": 0
+        },
+        "pivot": {
           "opacity": 0
         }
       }
@@ -2809,23 +2965,51 @@
     {
       "at": 0.65,
       "set": {
+        "ov-ad3": {
+          "opacity": 0.5
+        },
+        "ov-ac": {
+          "opacity": 0.5
+        },
+        "pivot": {
+          "opacity": 0,
+          "rotate": 0,
+          "rotateCenter": [
+            119.8113,
+            209.6226
+          ]
+        }
+      }
+    },
+    {
+      "at": 0.7,
+      "set": {
         "pivot": {
           "opacity": 0.5
         }
       }
     },
     {
-      "at": 1.0,
+      "at": 0.95,
       "set": {
         "pivot": {
           "rotate": 90,
           "rotateCenter": [
             119.8113,
             209.6226
-          ]
+          ],
+          "opacity": 0.5
         }
       },
       "ease": "inout"
+    },
+    {
+      "at": 1.0,
+      "set": {
+        "pivot": {
+          "opacity": 0
+        }
+      }
     }
   ]
 }
