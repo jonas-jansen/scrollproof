@@ -391,7 +391,7 @@
           ]
         ]
       ],
-      "layer": 5,
+      "layer": 3,
       "drawMode": "sequential",
       "proseScale": 0.007583,
       "style": {
@@ -475,6 +475,76 @@
       "props": {
         "opacity": 1,
         "draw": 0
+      }
+    },
+    {
+      "id": "pivot",
+      "path": [
+        [
+          [
+            119.8113,
+            209.6226
+          ],
+          [
+            173.2704,
+            209.6226
+          ],
+          [
+            226.7296,
+            209.6226
+          ],
+          [
+            280.1887,
+            209.6226
+          ]
+        ],
+        [
+          [
+            280.1887,
+            209.6226
+          ],
+          [
+            201.0692,
+            175.4088
+          ],
+          [
+            121.9497,
+            141.195
+          ],
+          [
+            42.8302,
+            106.9811
+          ]
+        ],
+        [
+          [
+            42.8302,
+            106.9811
+          ],
+          [
+            68.4906,
+            141.195
+          ],
+          [
+            94.1509,
+            175.4088
+          ],
+          [
+            119.8113,
+            209.6226
+          ]
+        ]
+      ],
+      "layer": 6,
+      "proseScale": 0.007583,
+      "style": {
+        "fill": "#ece6d8",
+        "fillOpacity": 0.5,
+        "stroke": "#e0a73c",
+        "strokeWidth": 2
+      },
+      "props": {
+        "opacity": 0
       }
     },
     {
@@ -2650,7 +2720,7 @@
       "id": "step-3",
       "label": "03",
       "heading": "A {em:Quarter-Turn}",
-      "body": "Now rotate the first triangle a quarter-turn about $A$. It falls exactly onto the second. A rotation is rigid \u2014 it changes nothing but position \u2014 so the two triangles are congruent, and enclose the same area:",
+      "body": "Take a copy of the first triangle and turn it a quarter-turn about $A$. It falls exactly onto the second. A rotation is rigid \u2014 it changes nothing but position \u2014 so the two triangles are congruent, and enclose the same area:",
       "equation": "{obj:snap1} = {obj:snap2}"
     }
   ],
@@ -2726,26 +2796,33 @@
     {
       "at": 0.5,
       "set": {
-        "proof-tri1": {
+        "pivot": {
           "rotate": 0,
           "rotateCenter": [
             119.8113,
             209.6226
           ],
-          "fillOpacity": 0.15
+          "opacity": 0
+        }
+      }
+    },
+    {
+      "at": 0.65,
+      "set": {
+        "pivot": {
+          "opacity": 0.5
         }
       }
     },
     {
       "at": 1.0,
       "set": {
-        "proof-tri1": {
+        "pivot": {
           "rotate": 90,
           "rotateCenter": [
             119.8113,
             209.6226
-          ],
-          "fillOpacity": 0.32
+          ]
         }
       },
       "ease": "inout"
