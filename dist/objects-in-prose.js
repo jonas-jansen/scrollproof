@@ -21,6 +21,11 @@
 import { pathToD } from './renderer.js';
 // ── Tuning ────────────────────────────────────────────────────────────────────
 const GLYPH_HEIGHT_EM = 1.2;
+// Length-bar glyphs (a degenerate, ~zero-height path — see makeGlyphGroup):
+// a bar spanning the whole canvas would be BAR_MAX_EM wide; bars scale linearly
+// from that, so equal figure-lengths render as equal widths. Height is fixed.
+const BAR_MAX_EM = 10;
+const BAR_THICKNESS_EM = 0.5;
 function parseSegments(str) {
     const out = [];
     const re = /\{obj:([^}]+)\}|\$([^$]+)\$|\{em:([^}]+)\}/g;
@@ -78,8 +83,13 @@ function addPathToSVG(svg, obj) {
  * Renders one or more PathObjects as a single inline SVG glyph.
  * Height is GLYPH_HEIGHT_EM; width is proportional to the combined aspect ratio.
  * Objects are drawn in scene order so outlines naturally appear on top of fills.
+ *
+ * Special case — a "length bar": when the combined box is essentially 1-D (a
+ * horizontal line, height ≈ 0), it is rendered as a solid colored bar whose
+ * WIDTH is proportional to the figure-space length (relative to canvasWidth),
+ * at a fixed thickness. Equal lengths → equal-width bars (Byrne magnitudes).
  */
-function makeGlyphGroup(objs) {
+function makeGlyphGroup(objs, canvasWidth) {
     // Combined bounding box across all objects
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const obj of objs) {
@@ -95,15 +105,46 @@ function makeGlyphGroup(objs) {
     }
     const w = maxX - minX;
     const h = maxY - minY;
-    const aspect = h > 0 ? w / h : 1;
+    const degenerate = w > 0 && h <= w * 0.02; // a horizontal line → a bar
     const svg = document.createElementNS(SVG_NS, 'svg');
-    svg.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
     svg.setAttribute('aria-hidden', 'true');
-    svg.style.height = `${GLYPH_HEIGHT_EM}em`;
-    svg.style.width = `${GLYPH_HEIGHT_EM * aspect}em`;
     svg.style.verticalAlign = 'middle';
     svg.style.display = 'inline-block';
     svg.style.flexShrink = '0';
+    // Explicit prose scale (em per figure-unit), if the author set one. All parts
+    // of a multi-object glyph share the same scale, so any part with it works.
+    const proseScale = objs.find(o => o.proseScale !== undefined)?.proseScale;
+    if (degenerate) {
+        // Length-bar: solid colored bar of width ∝ length, fixed thickness.
+        // Width from proseScale if present, else the canvas-relative fallback.
+        const widthEm = proseScale !== undefined ? w * proseScale : (w / canvasWidth) * BAR_MAX_EM;
+        svg.setAttribute('viewBox', `${minX} ${minY - 0.5} ${w} 1`);
+        svg.style.width = `${widthEm}em`;
+        svg.style.height = `${BAR_THICKNESS_EM}em`;
+        for (const obj of objs) {
+            const p = document.createElementNS(SVG_NS, 'path');
+            p.setAttribute('d', pathToD(obj.path));
+            p.setAttribute('fill', 'none');
+            p.setAttribute('stroke', obj.style?.stroke ?? obj.style?.fill ?? 'currentColor');
+            p.setAttribute('stroke-width', '1'); // fills the height-1 viewBox → solid bar
+            p.setAttribute('stroke-linecap', 'butt');
+            svg.appendChild(p);
+        }
+        return svg;
+    }
+    svg.setAttribute('viewBox', `${minX} ${minY} ${w} ${h}`);
+    if (proseScale !== undefined) {
+        // Intrinsic sizing: the box maps to em by a fixed figure→em scale, so a
+        // chosen dimension (radius, side) is the same em size across all glyphs.
+        svg.style.width = `${w * proseScale}em`;
+        svg.style.height = `${h * proseScale}em`;
+    }
+    else {
+        // Fallback: fit the box to the line height (width by aspect ratio).
+        const aspect = h > 0 ? w / h : 1;
+        svg.style.height = `${GLYPH_HEIGHT_EM}em`;
+        svg.style.width = `${GLYPH_HEIGHT_EM * aspect}em`;
+    }
     for (const obj of objs)
         addPathToSVG(svg, obj);
     return svg;
@@ -121,7 +162,7 @@ export function renderMixedContent(str, scene) {
             const prefix = seg.id + '_';
             const objs = scene.objects.filter((o) => 'path' in o && (o.id === seg.id || o.id.startsWith(prefix)));
             if (objs.length > 0) {
-                frag.appendChild(makeGlyphGroup(objs));
+                frag.appendChild(makeGlyphGroup(objs, scene.canvas.width));
             }
             else {
                 frag.appendChild(document.createTextNode(`{obj:${seg.id}?}`));
